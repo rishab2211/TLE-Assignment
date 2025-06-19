@@ -1,31 +1,31 @@
 import express, { Application, Request, Response } from "express";
+import mongoose from "mongoose"
+import { configDotenv } from "dotenv";
+import { studentRoute } from "./routes/studentRoute";
 
-const app = express();
-const PORT = 3000;
+const app: Application = express();
+const PORT = process.env.PORT;
 
+configDotenv();
 app.use(express.json());
 
-app.get("/user-info", async (req: Request, res: Response): Promise<any> => {
-    const handle = req.query.handle as string;
 
-    if (!handle) {
-        return res.status(400).json({ error: "Missing 'handle' query parameter" });
-    }
 
-    try {
-        const response = await fetch(`https://codeforces.com/api/user.info?handles=${handle}`);
-        const data = await response.json();
 
-        if (data.status !== "OK") {
-            return res.status(404).json({ error: "User not found" });
-        }
 
-        return res.json(data.result);
-    } catch (error) {
-        console.error("Error:", error);
-        return res.status(500).json({ error: "Failed to fetch data from Codeforces" });
-    }
-});
+
+mongoose.connect(process.env.DB_URL!).then(() => {
+    console.log("Connected to DB.")
+}).catch((err) => {
+    console.error("MongoDB conenction error: ", err);
+    process.exit(1)
+})
+
+
+
+app.use("/user", studentRoute);
+
+
 
 
 

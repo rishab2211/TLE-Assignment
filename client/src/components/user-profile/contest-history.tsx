@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
+import { RecentContests } from "./table";
+import { mockContestHistory } from "@/lib/constants";
+import StudentProfileColumns from "./columns-student-profile";
 
 type props = {
   days: "30" | "90" | "365";
@@ -46,7 +49,14 @@ const ContestHistory = ({ days }: props) => {
 
       <div className="p-4">
         <div className="text-sm font-semibold">Recent Contests</div>
-        <div></div>
+        <div className="border-b" />
+        <div>
+          {" "}
+          <RecentContests
+            data={mockContestHistory}
+            columns={StudentProfileColumns}
+          />
+        </div>
       </div>
     </div>
   );

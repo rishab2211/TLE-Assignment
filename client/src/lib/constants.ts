@@ -652,3 +652,44 @@ export const studentDetails: StudentDetails[] = [
         last_submission_date: "2024-06-01T20:10:00Z"
     }
 ];
+
+
+
+
+export const mockContestHistory = [
+  {
+    contest_name: "Codeforces Round #931 (Div. 2)",
+    date: "2025-06-10",
+    rank: 124,
+    rating_change: +54,
+    problems_solved: 4,
+  },
+  {
+    contest_name: "Educational Codeforces Round 168",
+    date: "2025-05-28",
+    rank: 312,
+    rating_change: -23,
+    problems_solved: 3,
+  },
+  {
+    contest_name: "Codeforces Round #928 (Div. 3)",
+    date: "2025-05-16",
+    rank: 88,
+    rating_change: +77,
+    problems_solved: 5,
+  },
+  {
+    contest_name: "Codeforces Global Round 31",
+    date: "2025-05-02",
+    rank: 410,
+    rating_change: +11,
+    problems_solved: 2,
+  },
+  {
+    contest_name: "Codeforces Round #926 (Div. 2)",
+    date: "2025-04-21",
+    rank: 198,
+    rating_change: -31,
+    problems_solved: 3,
+  },
+];
