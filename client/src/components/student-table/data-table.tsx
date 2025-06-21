@@ -4,8 +4,9 @@ import {
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
-  useReactTable,
   getFilteredRowModel,
+  getSortedRowModel,
+  useReactTable,
   type SortingState,
 } from "@tanstack/react-table";
 
@@ -17,9 +18,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "../ui/button";
+
 import { useState, type ReactNode } from "react";
 import { Input } from "../ui/input";
+import { Button } from "../ui/button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -28,6 +30,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+
 import { Settings2 } from "lucide-react";
 import { AddStudent } from "../add-student";
 import { exportTableToCSV } from "@/utils/export-csv";
@@ -49,8 +52,10 @@ export function DataTable<TData, TValue>({
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(), // ✅ add this
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
     state: {
       sorting,
       columnFilters,
@@ -59,9 +64,10 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex justify-between items-center py-4 ">
+      {/* Header */}
+      <div className="flex flex-wrap justify-between items-center py-4 gap-2">
         <Input
-          placeholder="Filter by name or email or phone or codeforces handle "
+          placeholder="Search by name, email, phone or CF handle"
           value={
             (table.getColumn("global-search")?.getFilterValue() as string) ?? ""
           }
@@ -71,31 +77,31 @@ export function DataTable<TData, TValue>({
           className="max-w-sm"
         />
 
-        <Button
-          onClick={() => {
-            // Get all rows
-            const rows = table.getRowModel().rows.map((row) => row.original);
-
-            // Get all keys from StudentDetails
-            const allKeys = rows.length > 0 ? Object.keys(rows[0]!) : [];
-
-            exportTableToCSV(rows, allKeys, "students.csv");
-          }}
-          className="mb-2"
-        >
-          Export CSV
-        </Button>
-
         <div className="flex items-center gap-2">
+          {/* Export Button */}
+          <Button
+            onClick={() => {
+              const rows = table.getRowModel().rows.map((row) => row.original);
+              const allKeys = rows.length > 0 ? Object.keys(rows[0]!) : [];
+              exportTableToCSV(rows, allKeys, "students.csv");
+            }}
+            variant="outline"
+          >
+            Export CSV
+          </Button>
+
+          {/* Add Student */}
           <AddStudent />
+
+          {/* View Options */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild className="cursor-pointer">
               <Button variant="secondary" size="sm">
-                <Settings2 />
+                <Settings2 className="mr-2 h-4 w-4" />
                 View
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[150px]">
+            <DropdownMenuContent align="end" className="w-[180px]">
               <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {table
@@ -105,41 +111,39 @@ export function DataTable<TData, TValue>({
                     typeof column.accessorFn !== "undefined" &&
                     column.getCanHide()
                 )
-                .map((column) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize cursor-pointer"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
-                        column.toggleVisibility(!!value)
-                      }
-                    >
-                      {column.columnDef.header as ReactNode}
-                    </DropdownMenuCheckboxItem>
-                  );
-                })}
+                .map((column) => (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) =>
+                      column.toggleVisibility(!!value)
+                    }
+                    className="capitalize cursor-pointer"
+                  >
+                    {column.columnDef.header as ReactNode}
+                  </DropdownMenuCheckboxItem>
+                ))}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>
+
+      {/* Table */}
       <div className="rounded-md border">
         <Table>
           <TableHeader className="bg-neutral-200 dark:bg-neutral-800">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id} className="font-bold">
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id} className="font-bold">
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
@@ -166,7 +170,7 @@ export function DataTable<TData, TValue>({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  No results found.
                 </TableCell>
               </TableRow>
             )}
@@ -174,21 +178,20 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
 
+      {/* Pagination */}
       <div className="flex items-center justify-end space-x-2 py-4">
         <Button
-          variant={"outline"}
-          size={"sm"}
+          variant="outline"
+          size="sm"
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
-          className="cursor-pointer"
         >
           Previous
         </Button>
         <Button
-          size={"sm"}
+          size="sm"
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
-          className="cursor-pointer"
         >
           Next
         </Button>

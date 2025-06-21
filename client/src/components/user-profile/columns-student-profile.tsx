@@ -1,31 +1,50 @@
 import type { ColumnDef } from "@tanstack/react-table";
+import type { ContestEntry } from "@/lib/types";
 
-type ContestHistory = {
-  contest_name: string;
-  date: string;
-  rank: number;
-  rating_change: number;
-  problems_solved: number;
-};
-
-const StudentProfileColumns: ColumnDef<ContestHistory>[] = [
+const StudentProfileColumns: ColumnDef<ContestEntry>[] = [
   {
-    accessorKey: "contest_name",
-    header: "CONTEST",
+    accessorKey: "contestName",
+    header: "Contest",
   },
   {
     accessorKey: "date",
-    header: "DATE",
+    header: "Date",
+    cell: ({ row }) => new Date(row.original.date).toLocaleDateString(),
   },
   {
     accessorKey: "rank",
-    header: "RANK",
+    header: "Rank",
   },
-  { accessorKey: "rating_change", header: "RATING CHANGE" },
   {
-    accessorKey: "problems_solved",
-    header: "PROBLEM SOLVED",
+    accessorKey: "ratingChange",
+    header: "Δ Rating",
   },
+  {
+    accessorKey: "problemsAttempted",
+    header: "Attempted",
+  },
+  {
+    accessorKey: "problemsUnsolved",
+    header: "Unsolved",
+  },{
+  id: "global-search",
+  header: () => null,
+  cell: () => null,
+  enableColumnFilter: true,
+  filterFn: (row, _columnId, filterValue: string) => {
+    const contestName = row.original.contestName?.toLowerCase() ?? "";
+    const rank = row.original.rank?.toString().toLowerCase() ?? "";
+    const ratingChange = row.original.ratingChange?.toString().toLowerCase() ?? "";
+    const filter = filterValue.toLowerCase();
+
+    return (
+      contestName.includes(filter) ||
+      rank.includes(filter) ||
+      ratingChange.includes(filter)
+    );
+  },
+},
+
 ];
 
 export default StudentProfileColumns;

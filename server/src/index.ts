@@ -2,6 +2,7 @@ import express, { Application, Request, Response } from "express";
 import mongoose from "mongoose"
 import { configDotenv } from "dotenv";
 import { studentRoute } from "./routes/studentRoute";
+import cors from "cors";
 
 const app: Application = express();
 const PORT = process.env.PORT;
@@ -11,7 +12,10 @@ app.use(express.json());
 
 
 
-
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true // If using cookies/auth headers
+}));
 
 
 mongoose.connect(process.env.DB_URL!).then(() => {
@@ -24,9 +28,6 @@ mongoose.connect(process.env.DB_URL!).then(() => {
 
 
 app.use("/user", studentRoute);
-
-
-
 
 
 app.get("/user-rating", async (req: Request, res: Response): Promise<any> => {

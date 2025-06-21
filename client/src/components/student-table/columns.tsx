@@ -12,8 +12,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "../ui/checkbox";
-
-// This type is used to define the shape of our data.
+import { useNavigate } from "react-router-dom";
+import { RowActions } from "./row-actions";
 
 export const columns: ColumnDef<StudentDetails>[] = [
   {
@@ -42,49 +42,31 @@ export const columns: ColumnDef<StudentDetails>[] = [
     accessorKey: "name",
     header: "STUDENT",
     cell: ({ row }) => {
-      const name: string = row.original.name;
-      const studentId: string = row.original.student_id;
+      const name = `${row.original.firstName} ${row.original.lastName}`;
+      const id = row.original._id;
 
       return (
         <div className="flex flex-col font-semibold">
           <div>{name}</div>
-          <div className="text-neutral-500 dark:text-neutral-400">
-            Student ID: {studentId}
-          </div>
+          <div className="text-neutral-500 dark:text-neutral-400">ID: {id}</div>
         </div>
       );
     },
   },
   {
-    accessorKey: "contact",
-    header: "CONTACT",
-    cell: ({ row }) => {
-      const email: string = row.original.email;
-      const phone: string = row.original.phone;
-
-      return (
-        <div className="flex flex-col font-semibold">
-          <div>{email}</div>
-          <div className="text-neutral-500 dark:text-neutral-400">{phone}</div>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "codeforces_handle",
+    accessorKey: "handle",
     header: "CF HANDLE",
     cell: ({ row }) => {
-      const codeforces_handle: string = row.original.codeforces_handle;
-
-      return <div>{codeforces_handle}</div>;
+      const handle = row.original.handle;
+      return <div>{handle}</div>;
     },
   },
   {
     accessorKey: "rating",
     header: "RATING",
     cell: ({ row }) => {
-      const current: number = row.original.current_rating;
-      const max: number = row.original.max_rating;
+      const current = row.original.currentRating;
+      const max = row.original.maxRating;
 
       return (
         <div className="flex flex-col font-semibold">
@@ -97,61 +79,54 @@ export const columns: ColumnDef<StudentDetails>[] = [
     },
   },
   {
-    accessorKey: "last_updated",
-    header: "LAST UPDATED",
+    accessorKey: "rank",
+    header: "RANK",
     cell: ({ row }) => {
-      const last_updated: string = row.original.last_data_update;
+      const rank = row.original.rank;
+      const maxRank = row.original.maxRank;
 
-      return <div>{last_updated}</div>;
+      return (
+        <div className="flex flex-col font-semibold">
+          <div>{rank}</div>
+          <div className="text-neutral-500 dark:text-neutral-400">
+            Max: {maxRank}
+          </div>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "lastOnlineTimeSeconds",
+    header: "LAST ONLINE",
+    cell: ({ row }) => {
+      const date = new Date(row.original.lastOnlineTimeSeconds);
+      return <div>{date.toLocaleString()}</div>;
     },
   },
   {
     header: "MORE",
     id: "actions",
     cell: ({ row }) => {
-      const student_id = row.original.student_id;
+      const id = row.original._id;
 
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(student_id)}
-            >
-              Copy Student ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
+      return <RowActions id={id} handle={row.original.handle} />;
     },
   },
   {
-    id: "global-search", // 👈 virtual column used only for filtering
+    id: "global-search",
     header: () => null,
     cell: () => null,
     enableColumnFilter: true,
     filterFn: (row, _columnId, filterValue: string) => {
-      const name = row.original.name?.toLowerCase() ?? "";
-      const email = row.original.email?.toLowerCase() ?? "";
-      const phone = row.original.phone?.toLowerCase() ?? "";
-      const cfHandle = row.original.codeforces_handle?.toLowerCase() ?? "";
+      const first = row.original.firstName?.toLowerCase() ?? "";
+      const last = row.original.lastName?.toLowerCase() ?? "";
+      const handle = row.original.handle?.toLowerCase() ?? "";
 
       const filter = filterValue.toLowerCase();
-
       return (
-        name.includes(filter) ||
-        email.includes(filter) ||
-        phone.includes(filter) ||
-        cfHandle.includes(filter)
+        first.includes(filter) ||
+        last.includes(filter) ||
+        handle.includes(filter)
       );
     },
   },

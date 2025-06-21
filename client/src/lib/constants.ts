@@ -1,6 +1,5 @@
-import type { StudentDetails } from "./types";
-
-export const studentDetails: StudentDetails[] = [
+// demo data
+export const studentDetails = [
     {
         student_id: "STU001",
         name: "Alice Johnson",

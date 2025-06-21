@@ -355,7 +355,7 @@ studentRoute.get("/contest-history", async (req: Request, res: Response): Promis
             contestList.push({
                 contestName: contest.contestName,
                 date: contest.updatedAt,
-                rank: contest.rank || "-", // add rank if stored in future
+                // rank: contest.rank || "-", // add rank if stored in future
                 ratingChange: contest.newRating - contest.oldRating,
                 problemsAttempted: contestSubmissions.attempted.size,
                 problemsUnsolved: unsolvedCount,
